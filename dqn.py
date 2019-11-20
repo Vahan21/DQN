@@ -69,6 +69,7 @@ class DQNAgent:
     def get_epsilon_greedy_action(self):
         if self.epsilon > np.random.uniform(0, 1):
             return np.random.choice(self.legal_actions)
+
         else:
             predicted_rewards = []
             for action in self.legal_actions:
@@ -81,9 +82,10 @@ class DQNAgent:
     def play_and_train(self):
         reward_sums = []
         hm_times_won = 0
-        for i in range(self.max_iter):
+        for episode in range(self.max_iter):
             data_df = pd.DataFrame(columns=['state 1', 'state 2', 'state 3', 'state 4', 'action', 'reward'])
             self.current_state = self.env.reset()
+
             for iteration_step in range(self.max_episode_steps - 1):
                 action = self.get_epsilon_greedy_action()
                 next_state, reward, done, info = self.env.step(action)
@@ -96,8 +98,12 @@ class DQNAgent:
             if iteration_step == self.max_episode_steps - 2:
                 hm_times_won += 1
                 if hm_times_won == self.stop_after_n_wins:
+                    print(f'ended training after winning the game {hm_times_won} times')
                     self.plot_rewards(reward_sums)
                     return
+
+            if episode % 10 == 0:
+                print(f'current episode: {episode}')
 
             reward_sums.append(data_df['reward'].sum())
 
@@ -130,6 +136,6 @@ class DQNAgent:
         print(f'total rewards of episode {total_rewards}')
 
 
-dqn = DQNAgent(max_iter=10, epsilon=0.95, gamma=0.99, buffer_size=1000, batch_size=32, epsilon_decay=0.003)
+dqn = DQNAgent(max_iter=1000, epsilon=0.95, gamma=0.99, buffer_size=1000, batch_size=32, epsilon_decay=0.003)
 dqn.play_and_train()
 dqn.play()

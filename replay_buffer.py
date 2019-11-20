@@ -15,7 +15,6 @@ class ReplayBuffer(object):
         size_diff = len(self._storage) - self._maxsize
         if size_diff > 0:
             self._storage = self._storage.iloc[size_diff:]
-        print('Storage new len: ', len(self._storage))
 
     def sample(self, batch_size):
         batch_size = min(len(self._storage), batch_size)
